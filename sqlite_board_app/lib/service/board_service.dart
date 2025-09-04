@@ -10,10 +10,10 @@ class BoardService {
   }
 
   // 데이터 조회
-  Future<Map<String, dynamic>?> get(String id) async {
+  Future<Boards?> select(String id) async {
     final db = await DatabaseHelper.instance.database;
     final result = await db.query('boards', where: 'id = ?', whereArgs: [id]);
-    return result.isNotEmpty ? result.first : null;
+    return result.isNotEmpty ? Boards.fromMap(result.first) : null;
   }
 
   // 데이터 등록
@@ -25,7 +25,13 @@ class BoardService {
   // 데이터 수정
   Future<int> update(Boards board) async {
     final db = await DatabaseHelper.instance.database;
-    return await db.update('boards', board.toMap(), where: 'id = ?', whereArgs: [board.id]);
+    Map<String, dynamic> data = {
+      'title': board.title,
+      'writer': board.writer,
+      'content': board.content,
+      'updated_at': DateTime.now().toIso8601String(),
+    };
+    return await db.update('boards', data, where: 'id = ?', whereArgs: [board.id]);
   }
 
   // 데이터 삭제
